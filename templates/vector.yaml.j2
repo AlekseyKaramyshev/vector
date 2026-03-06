@@ -1,0 +1,22 @@
+data_dir: /var/lib/vector
+
+sources:
+  host_logs:
+    type: file
+    include:
+      - /var/log/*.log
+      - /var/log/**/*.log
+    read_from: "beginning"
+
+sinks:
+  clickhouse_logs:
+    type: clickhouse
+    inputs:
+      - host_logs
+    endpoint: "http://{{ clickhouse_server_ip }}:8123"
+    database: "logs"
+    table: "logs"
+    batch:
+      max_events: 1000
+      timeout_secs: 1
+    healthcheck: true
